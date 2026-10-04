@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CNS Relapse Risk Calculator</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .container { background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; text-align: center; margin-bottom: 5px; }
+        p.subtitle { text-align: center; color: #7f8c8d; margin-bottom: 25px; font-size: 0.9em; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; color: #34495e; }
+        select { width: 100%; padding: 10px; border: 1px solid #bdc3c7; border-radius: 5px; font-size: 16px; background-color: #fdfdfd; }
+        button { width: 100%; background-color: #3498db; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 15px; transition: background 0.3s; }
+        button:hover { background-color: #2980b9; }
+        #result-box { margin-top: 25px; padding: 20px; border-radius: 5px; text-align: center; display: none; }
+        .score { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+        .risk-tier { font-size: 20px; font-weight: bold; padding: 5px 10px; border-radius: 4px; display: inline-block; }
+        .rate { margin-top: 10px; font-size: 16px; color: #555; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>CNS Relapse Risk Score</h2>
+    <p class="subtitle">Pediatric Acute Lymphoblastic Leukemia</p>
+
+    <div class="form-group">
+        <label>Initial CNS Status</label>
+        <select id="cns">
+            <option value="0">CNS 1 (0 pts)</option>
+            <option value="2">CNS 2 (+2 pts)</option>
+            <option value="2">CNS 3 (+2 pts)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Total Leukocyte Count (TLC)</label>
+        <select id="tlc">
+            <option value="0">&lt; 50,000 / &mu;L (0 pts)</option>
+            <option value="2">&ge; 50,000 / &mu;L (+2 pts)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Age at Diagnosis</label>
+        <select id="age">
+            <option value="0">&ge; 5 Years Old (0 pts)</option>
+            <option value="1">&lt; 5 Years Old (+1 pt)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Maintenance Phase Interruption</label>
+        <select id="maint">
+            <option value="0">&le; 14 Days (0 pts)</option>
+            <option value="2">&gt; 14 Days (+2 pts)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Pre-Maintenance Chemo Interruption</label>
+        <select id="preMaint">
+            <option value="0">No (0 pts)</option>
+            <option value="1">Yes (+1 pt)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>L-Asparaginase Interruption</label>
+        <select id="lasp">
+            <option value="0">No (0 pts)</option>
+            <option value="1">Yes (+1 pt)</option>
+        </select>
+    </div>
+
+    <button onclick="calculateRisk()">Calculate Risk Score</button>
+
+    <div id="result-box">
+        <div class="score">Total Score: <span id="score-val"></span></div>
+        <div class="risk-tier" id="tier-val"></div>
+        <div class="rate" id="rate-val"></div>
+    </div>
+</div>
+
+<script>
+    function calculateRisk() {
+        let score = 0;
+        score += parseInt(document.getElementById('cns').value);
+        score += parseInt(document.getElementById('tlc').value);
+        score += parseInt(document.getElementById('age').value);
+        score += parseInt(document.getElementById('maint').value);
+        score += parseInt(document.getElementById('preMaint').value);
+        score += parseInt(document.getElementById('lasp').value);
+
+        let tier = "";
+        let rate = "";
+        let bgColor = "";
+        let color = "#fff";
+
+        if (score <= 1) {
+            tier = "Low Risk"; rate = "Estimated Relapse Rate: ~2.7%"; bgColor = "#2ecc71"; // Green
+        } else if (score === 2) {
+            tier = "Intermediate Risk"; rate = "Estimated Relapse Rate: ~13.6%"; bgColor = "#f1c40f"; color = "#333"; // Yellow
+        } else if (score <= 4) {
+            tier = "High Risk"; rate = "Estimated Relapse Rate: ~34.9%"; bgColor = "#e67e22"; // Orange
+        } else {
+            tier = "Very High Risk"; rate = "Estimated Relapse Rate: ~76.7%"; bgColor = "#e74c3c"; // Red
+        }
+
+        document.getElementById('score-val').innerText = score;
+        document.getElementById('tier-val').innerText = tier;
+        document.getElementById('tier-val').style.backgroundColor = bgColor;
+        document.getElementById('tier-val').style.color = color;
+        document.getElementById('rate-val').innerText = rate;
+        
+        let resultBox = document.getElementById('result-box');
+        resultBox.style.display = "block";
+        resultBox.style.backgroundColor = "#f8f9fa";
+        resultBox.style.border = "2px solid " + bgColor;
+    }
+</script>
+</body>
+</html>
